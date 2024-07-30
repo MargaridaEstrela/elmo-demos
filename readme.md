@@ -348,12 +348,12 @@ By calling **middleware** from the command line you can monitor several aspects 
 This project implements an emotion recognition and feedback system using a combination of computer vision and machine learning techniques. The system captures an image from a camera, analyzes the detected face to determine the emotion, and provides feedback through images and sounds.
 
 ### Features
-- **Real-Time Emotion Detection:** Uses the RMN (Recurrent Neural Network) model to detect emotions from facial expressions in real-time.
+- **Real-Time Emotion Detection:** Uses the RMN (Residual Masking Network) model to detect emotions from facial expressions in real-time.
 - **User Interface:** An interactive GUI allows users to trigger emotion detection and view the results.
 - **Feedback Mechanism:** Provides visual and auditory feedback based on the detected emotion, increasing user engagement.
-- **Change Screen:** Dynamically update the robot's screen
-- **Change Icons:** Update icons on the robot's LED matrix
-- **Set Pan and Tilt Values:** Control the pan and tilt values
+- **Change Screen:** Dynamically updates the robot's screen
+- **Change Icons:** Updates icons on the robot's LED matrix
+- **Set Pan and Tilt Values:** Controls the pan and tilt values of the robot
 - **Interactive Emotion Feedback:** Users can trigger specific emotions and see how the system responds with appropriate feedback.
 
 ### Usage
