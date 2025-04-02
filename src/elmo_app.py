@@ -3,7 +3,7 @@ import cv2
 import time
 import threading
 import random
-import PySimpleGUI as sg
+import FreeSimpleGUI as sg
 
 from server import ElmoServer
 from emotions import Emotions
@@ -17,6 +17,7 @@ connect_mode = False
 random_mode_active = False
 random_mode_stop_event = threading.Event()
 
+EMOTIONS = ["angry", "disgust", "fear", "happy", "sad", "surprise", "neutral"]
 
 def create_layout():
     """
@@ -130,6 +131,9 @@ def create_layout():
         [sg.Text("", size=(1, 2))],
         [
             sg.Push(),
+            sg.Text("", size=(2, 1)),
+            sg.Button("Nodding", size=(15, 1)),
+            sg.Text("", size=(2, 1)),
             sg.Button("Random", size=(15, 1), button_color=("white", "green")),
             sg.Push(),
         ],
@@ -158,6 +162,11 @@ def create_layout():
             sg.Button("Neutral", size=(10, 1), key="neutral"),
             sg.Text("", size=(1, 1)),
             sg.Button("Record", size=(10, 1), button_color=("white", "red")),
+            sg.Push(),
+        ],
+        [
+            sg.Push(),
+            sg.Button("Random", size=(10, 1), key="random_emotions"),
             sg.Push(),
         ],
         [sg.Text("", size=(1, 2))],
@@ -241,6 +250,7 @@ def handle_events():
         "Center Player": lambda: emotions.center_player(),
         "Default Screen": lambda: elmo.set_image("stare.png"),
         "Default Icon": lambda: elmo.set_icon("elmo_idm.png"),
+        "Nodding": play_nodding,
         "Random": toggle_random_mode,
     }
 
@@ -298,6 +308,37 @@ def handle_events():
                 emotions.give_feedback(event)
             else:
                 emotions.give_feedback()
+                
+    if event == "random_emotions":
+        emotions_list = random.sample(EMOTIONS, len(EMOTIONS)) 
+        for emotion in emotions_list:
+            elmo.play_sound(f"emoshow/emotions/{emotion}.wav")
+            elmo.set_image(f"emoshow/emotions/{emotion}.png")
+            time.sleep(3)
+            frame, results = emotions.analyse_emotion()
+            if results:
+                image = emotions.draw_results(frame, results)
+                window["emotion_results"].update(data=image)
+                res = format_emotion_results(results[0]["proba_list"])
+                window["results"].update(res)
+                emotions.give_feedback(emotion)
+            else:
+                elmo.set_image("cry.png")
+                elmo.play_sound(f"bad_{emotion}.wav")
+                time.sleep(6)
+            
+            time.sleep(5)
+            
+
+def play_nodding():
+    tilt = elmo.get_tilt()
+    set_pan_tilt(-tilt, elmo.move_tilt, elmo.set_tilt)
+    time.sleep(1)
+    set_pan_tilt(tilt, elmo.move_tilt, elmo.set_tilt)
+    time.sleep(1)
+    set_pan_tilt(-tilt, elmo.move_tilt, elmo.set_tilt)
+    time.sleep(1)
+    set_pan_tilt(tilt, elmo.move_tilt, elmo.set_tilt)
 
 
 def toggle_random_mode():

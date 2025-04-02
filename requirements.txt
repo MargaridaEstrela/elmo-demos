@@ -1,0 +1,4 @@
+freesimplegui
+netifaces
+opencv-python
+rmn

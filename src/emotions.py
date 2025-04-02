@@ -61,31 +61,40 @@ class Emotions:
         x, y, w, h = faces[0]
         cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
 
-        # Calculate adjustments
-        horizontal_adjustment = (frame_center_x - (x + w / 2)) // 4
-        vertical_adjustment = (frame_center_y - (y + h / 2)) // 8
+        # Compute offsets
+        face_center_x = x + w / 2
+        face_center_y = y + h / 2
+        horizontal_offset = face_center_x - frame_center_x
+        vertical_offset = frame_center_y - face_center_y
 
-        # Get pan and tilt angles
-        pan = self.elmo.get_pan()
-        tilt = self.elmo.get_tilt()
+        # Get current pan and tilt angles
+        current_pan_angle = self.elmo.get_current_pan_angle()
+        current_tilt_angle = self.elmo.get_current_tilt_angle()
 
-        new_pan_angle = pan + int(horizontal_adjustment / 3)
-        new_tilt_angle = tilt - int(vertical_adjustment / 3)
+        # Convert pixel offsets to angle corrections using camera FOV
+        horizontal_adjustment = (horizontal_offset / frame_width) * 62.2  # Use 62.2° FOV for pan
+        vertical_adjustment = (vertical_offset / frame_height) * 48.8  # Use 48.8° FOV for tilt
 
-        # Check if values are within bounds
+        # Apply angle corrections and update default values
+        new_pan_angle = round(current_pan_angle - horizontal_adjustment)
+        new_tilt_angle = round(current_tilt_angle - vertical_adjustment)
+
+        # Check if values are within valid range
         new_pan_angle = self.elmo.check_pan_angle(new_pan_angle)
         new_tilt_angle = self.elmo.check_tilt_angle(new_tilt_angle)
 
         # Update default values
-        self.elmo.set_pan(new_pan_angle)
-        self.elmo.set_tilt(new_tilt_angle)
+        if self.player == 1:
+            self.elmo.set_default_pan_left(new_pan_angle)
+            self.elmo.set_default_tilt_left(new_tilt_angle)
+        else:
+            self.elmo.set_default_pan_right(new_pan_angle)
+            self.elmo.set_default_tilt_right(new_tilt_angle)
 
         self.elmo.move_pan(new_pan_angle)
         time.sleep(2)
         self.elmo.move_tilt(new_tilt_angle)
 
-        print(f"Horizontal adjustment: {int(horizontal_adjustment/3)}")
-        print(f"Vertical adjustment: {int(vertical_adjustment/3)}")
 
     def take_picture(self):
         """
@@ -102,7 +111,6 @@ class Emotions:
 
         self.elmo.set_image("camera_v2.png")
         time.sleep(1)
-        self.elmo.set_image("black.png")
         self.elmo.set_icon("loading.gif")
 
         return self.elmo.grab_image()
@@ -150,7 +158,7 @@ class Emotions:
                 self.elmo.set_image("stare.png")
                 self.elmo.set_icon("elmo_idm.png")
             else:
-                self.elmo.set_image("stare.png")
+                self.elmo.set_image("cry.png")
                 self.elmo.play_sound(f"bad_{emotion}.wav")
                 time.sleep(6)
 

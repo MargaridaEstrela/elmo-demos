@@ -99,16 +99,8 @@ def main():
         elmo_ip, elmo_port = sys.argv[1:3]
         debug = False
     else:
-        print("Usage: python3 emoshow_handler.py <elmoIp> <port> (--debug)")
+        print("Usage: python3 demos_handler.py <elmoIp> <port>")
         return
-
-    # Check debug flag
-    if len(sys.argv) == 4:
-        if sys.argv[3] == "--debug":
-            debug = True
-        else:
-            print("Usage: python3 emoshow.py <elmoIp> <port> (--debug)")
-            return
 
     print("Starting connection...")
 
@@ -117,8 +109,7 @@ def main():
 
     print("Server Started")
 
-    if not debug:
-        enable_torque()
+    enable_torque()
 
     while True:
         data, addr = s.recvfrom(1024)
